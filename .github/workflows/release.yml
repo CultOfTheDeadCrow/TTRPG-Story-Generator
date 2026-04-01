@@ -28,7 +28,7 @@ jobs:
         run: echo "CXXFLAGS=-std=c++20" >> $GITHUB_ENV
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-warnings
 
       - name: Build (electron-vite)
         run: npx electron-vite build
