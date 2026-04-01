@@ -113,4 +113,4 @@ Drafts from story generation are persisted to the DB so you can close the app mi
 
 ## License
 
-License: TBD
+License: GPL v3
