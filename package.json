@@ -70,6 +70,10 @@
       "target": [
         "nsis"
       ]
+    },
+    "publish": {
+      "provider": "github",
+      "releaseType": "draft"
     }
   }
 }
