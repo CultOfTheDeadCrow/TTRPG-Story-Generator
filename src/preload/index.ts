@@ -86,5 +86,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.invoke('notes:applySession', params),
     getAll: () => ipcRenderer.invoke('sessions:getAll'),
     getById: (id: string) => ipcRenderer.invoke('sessions:getById', id),
+    savePendingDraft: (params: { rawNotes: string; analysisText: string; entityUpdates: unknown[]; newEntities: unknown[] }) =>
+      ipcRenderer.invoke('sessions:savePendingDraft', params),
+    listPendingDrafts: () => ipcRenderer.invoke('sessions:listPendingDrafts'),
+    getPendingDraftById: (id: string) => ipcRenderer.invoke('sessions:getPendingDraftById', id),
+    deletePendingDraft: (id: string) => ipcRenderer.invoke('sessions:deletePendingDraft', id),
   },
 })

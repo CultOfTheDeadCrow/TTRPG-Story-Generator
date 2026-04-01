@@ -1,6 +1,6 @@
 import Database from 'better-sqlite3'
 import { randomUUID } from 'crypto'
-import type { ProposedUpdate, NewEntityProposal, SessionRecord } from '../../shared/types'
+import type { ProposedUpdate, NewEntityProposal, SessionRecord, PendingSessionRecord } from '../../shared/types'
 import { getEntityById } from './entities'
 
 export function applySession(
@@ -124,4 +124,70 @@ export function getSessionById(db: Database.Database, id: string): SessionRecord
   const row = db.prepare('SELECT * FROM sessions WHERE id = ?').get(id) as RawSessionRow | undefined
   if (!row) return null
   return parseSessionRow(row)
+}
+
+interface RawPendingSessionRow {
+  id: string
+  title: string
+  raw_notes: string
+  analysis_text: string
+  entity_updates: string  // JSON
+  new_entities: string    // JSON
+  created_at: number
+}
+
+function parsePendingSessionRow(row: RawPendingSessionRow): PendingSessionRecord {
+  return {
+    id: row.id,
+    title: row.title,
+    raw_notes: row.raw_notes,
+    analysis_text: row.analysis_text,
+    entity_updates: JSON.parse(row.entity_updates),
+    new_entities: JSON.parse(row.new_entities),
+    created_at: row.created_at,
+  }
+}
+
+export function savePendingSession(
+  db: Database.Database,
+  params: {
+    rawNotes: string
+    analysisText: string
+    entityUpdates: ProposedUpdate[]
+    newEntities: NewEntityProposal[]
+  }
+): PendingSessionRecord {
+  const id = randomUUID()
+  const now = Math.floor(Date.now() / 1000)
+  const title = params.rawNotes.slice(0, 60).replace(/\n/g, ' ') +
+    ' \u2014 ' + new Date(now * 1000).toISOString().slice(0, 10)
+  db.prepare(`
+    INSERT INTO pending_sessions
+      (id, title, raw_notes, analysis_text, entity_updates, new_entities, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    id, title, params.rawNotes, params.analysisText,
+    JSON.stringify(params.entityUpdates),
+    JSON.stringify(params.newEntities),
+    now
+  )
+  return getPendingSessionById(db, id)!
+}
+
+export function listPendingSessions(db: Database.Database): PendingSessionRecord[] {
+  const rows = db
+    .prepare('SELECT * FROM pending_sessions ORDER BY created_at DESC')
+    .all() as RawPendingSessionRow[]
+  return rows.map(parsePendingSessionRow)
+}
+
+export function getPendingSessionById(db: Database.Database, id: string): PendingSessionRecord | null {
+  const row = db.prepare('SELECT * FROM pending_sessions WHERE id = ?').get(id) as RawPendingSessionRow | undefined
+  if (!row) return null
+  return parsePendingSessionRow(row)
+}
+
+export function deletePendingSession(db: Database.Database, id: string): { ok: boolean } {
+  db.prepare('DELETE FROM pending_sessions WHERE id = ?').run(id)
+  return { ok: true }
 }

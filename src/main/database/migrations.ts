@@ -79,6 +79,24 @@ const migrations: Migration[] = [
     up: (db) => {
       db.exec(`ALTER TABLE sessions ADD COLUMN applied_entity_ids TEXT NOT NULL DEFAULT '[]'`)
     }
+  },
+  {
+    version: 4,
+    up: (db) => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS pending_sessions (
+          id             TEXT PRIMARY KEY NOT NULL,
+          title          TEXT NOT NULL DEFAULT '',
+          raw_notes      TEXT NOT NULL DEFAULT '',
+          analysis_text  TEXT NOT NULL DEFAULT '',
+          entity_updates TEXT NOT NULL DEFAULT '[]',
+          new_entities   TEXT NOT NULL DEFAULT '[]',
+          created_at     INTEGER NOT NULL DEFAULT (unixepoch())
+        );
+        CREATE INDEX IF NOT EXISTS idx_pending_sessions_created
+          ON pending_sessions(created_at DESC);
+      `)
+    }
   }
 ]
 

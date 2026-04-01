@@ -61,6 +61,16 @@ export interface SessionRecord {
   created_at: number
 }
 
+export interface PendingSessionRecord {
+  id: string
+  title: string
+  raw_notes: string
+  analysis_text: string
+  entity_updates: ProposedUpdate[]
+  new_entities: NewEntityProposal[]
+  created_at: number
+}
+
 export interface StoryRecord {
   id: string
   prompt: string
@@ -95,7 +105,7 @@ export interface EntityHistoryEntry {
   created_at: number
 }
 
-export type ViewType = 'characters' | 'locations' | 'events' | 'story-generator' | 'story-drafts' | 'session-import' | 'story-archive' | 'session-archive' | 'settings'
+export type ViewType = 'characters' | 'locations' | 'events' | 'story-generator' | 'story-drafts' | 'session-import' | 'pending-sessions' | 'story-archive' | 'session-archive' | 'settings'
 
 export interface NavigationState {
   view: ViewType

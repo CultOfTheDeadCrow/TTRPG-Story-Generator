@@ -207,6 +207,16 @@ export function EntitySidebar({ nav, onNavigate, refreshKey }: EntitySidebarProp
                   <span>Session Import</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={nav.view === 'pending-sessions'}
+                  onClick={() => onNavigate({ view: 'pending-sessions', selectedEntityId: null })}
+                  className="pl-8"
+                >
+                  <ClipboardListIcon className="h-4 w-4" />
+                  <span>Pending Sessions</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

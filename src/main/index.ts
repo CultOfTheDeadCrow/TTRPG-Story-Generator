@@ -10,7 +10,7 @@ import { getAllEntities, getEntityById, createEntity, updateEntity, deleteEntity
 import { getApiKey, setApiKey, getApiKeyStatus } from './services/settings'
 import { registerAiHandlers } from './services/ai'
 import { registerNotesHandlers } from './services/notes'
-import { applySession, getAllSessions, getSessionById } from './services/sessions'
+import { applySession, getAllSessions, getSessionById, savePendingSession, listPendingSessions, getPendingSessionById, deletePendingSession } from './services/sessions'
 import { saveDraft, getDrafts, getStoryById, discardDraft, applyStory, getAllAppliedStories } from './services/stories'
 import type { EntityType, ProposedUpdate, NewEntityProposal } from '../shared/types'
 
@@ -150,6 +150,40 @@ ipcMain.handle('sessions:getById', (_event, id: string) => {
     return getSessionById(getDatabase(), id)
   } catch (err) {
     log.error('[ipc] sessions:getById failed', err)
+    throw err
+  }
+})
+
+// Pending session draft IPC handlers (per D-07, D-09, D-10, D-13)
+ipcMain.handle('sessions:savePendingDraft', (_event, params: { rawNotes: string; analysisText: string; entityUpdates: unknown[]; newEntities: unknown[] }) => {
+  try {
+    return savePendingSession(getDatabase(), params as Parameters<typeof savePendingSession>[1])
+  } catch (err) {
+    log.error('[ipc] sessions:savePendingDraft failed', err)
+    throw err
+  }
+})
+ipcMain.handle('sessions:listPendingDrafts', () => {
+  try {
+    return listPendingSessions(getDatabase())
+  } catch (err) {
+    log.error('[ipc] sessions:listPendingDrafts failed', err)
+    throw err
+  }
+})
+ipcMain.handle('sessions:getPendingDraftById', (_event, id: string) => {
+  try {
+    return getPendingSessionById(getDatabase(), id)
+  } catch (err) {
+    log.error('[ipc] sessions:getPendingDraftById failed', err)
+    throw err
+  }
+})
+ipcMain.handle('sessions:deletePendingDraft', (_event, id: string) => {
+  try {
+    return deletePendingSession(getDatabase(), id)
+  } catch (err) {
+    log.error('[ipc] sessions:deletePendingDraft failed', err)
     throw err
   }
 })

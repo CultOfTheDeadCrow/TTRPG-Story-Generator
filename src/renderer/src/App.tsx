@@ -11,6 +11,7 @@ import {
 } from '@renderer/components/ui/alert-dialog'
 import { AppShell } from './components/AppShell'
 import { DraftsList } from './components/DraftsList'
+import { PendingSessionsList } from './components/PendingSessionsList'
 import { EntityEditor } from './components/EntityEditor'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { SessionArchiveScreen } from './components/SessionArchiveScreen'
@@ -18,7 +19,7 @@ import { SessionImportScreen } from './components/SessionImportScreen'
 import { SettingsScreen } from './components/SettingsScreen'
 import { StoryArchiveScreen } from './components/StoryArchiveScreen'
 import { StoryGenerator } from './components/StoryGenerator'
-import type { NavigationState, StoryRecord } from '../../shared/types'
+import type { NavigationState, StoryRecord, PendingSessionRecord } from '../../shared/types'
 
 function App(): JSX.Element {
   const [nav, setNav] = useState<NavigationState>({ view: 'characters', selectedEntityId: null })
@@ -80,6 +81,10 @@ function App(): JSX.Element {
     setNav({ view: 'story-generator', selectedEntityId: draft.id })
   }
 
+  function handleOpenPendingSession(draft: PendingSessionRecord): void {
+    setNav({ view: 'session-import', selectedEntityId: draft.id })
+  }
+
   function renderContent(): JSX.Element {
     const { view, selectedEntityId } = nav
 
@@ -87,6 +92,14 @@ function App(): JSX.Element {
       return (
         <DraftsList
           onOpenDraft={handleOpenDraft}
+        />
+      )
+    }
+
+    if (view === 'pending-sessions') {
+      return (
+        <PendingSessionsList
+          onOpenPendingSession={handleOpenPendingSession}
         />
       )
     }
@@ -106,6 +119,7 @@ function App(): JSX.Element {
         <SessionImportScreen
           apiKeyConfigured={apiKeyConfigured}
           onEntityListRefresh={() => setRefreshKey(k => k + 1)}
+          pendingDraftId={selectedEntityId}
         />
       )
     }

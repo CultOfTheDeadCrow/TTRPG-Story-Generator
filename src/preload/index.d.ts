@@ -1,4 +1,4 @@
-import type { Entity, EntityType, EntityHistoryEntry, ProposedUpdate, StoryRecord, SessionRecord, NewEntityProposal } from '../shared/types'
+import type { Entity, EntityType, EntityHistoryEntry, ProposedUpdate, StoryRecord, SessionRecord, NewEntityProposal, PendingSessionRecord } from '../shared/types'
 
 export interface ElectronAPI {
   ping: () => Promise<string>
@@ -47,6 +47,13 @@ export interface ElectronAPI {
     applySession: (params: { notes: string; entityUpdates: ProposedUpdate[]; newEntities: NewEntityProposal[] }) => Promise<{ appliedCount: number; createdCount: number; sessionId: string }>
     getAll: () => Promise<SessionRecord[]>
     getById: (id: string) => Promise<SessionRecord | null>
+    savePendingDraft: (params: {
+      rawNotes: string; analysisText: string;
+      entityUpdates: ProposedUpdate[]; newEntities: NewEntityProposal[]
+    }) => Promise<PendingSessionRecord>
+    listPendingDrafts: () => Promise<PendingSessionRecord[]>
+    getPendingDraftById: (id: string) => Promise<PendingSessionRecord | null>
+    deletePendingDraft: (id: string) => Promise<{ ok: boolean }>
   }
 }
 
